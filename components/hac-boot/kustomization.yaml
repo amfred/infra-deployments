@@ -1,10 +1,11 @@
 resources:
 - environment.yaml
-- inventory.yml
 - bundle.yaml
+- hac_nav.yaml
+- hac-dev.yaml
+- hac.yaml
 - chrome.yml 
 - chrome-route.yml 
-- inventory-route.yml  
 
 generatorOptions:
   disableNameSuffixHash: true
