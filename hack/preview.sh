@@ -75,6 +75,17 @@ if [ -n "$DOCKER_IO_AUTH" ]; then
     rm $AUTH
 fi
 
+if [ -n "$QUAY_IO_KUBESECRET" ]; then
+    TMP_QUAY=$(mktemp)
+    cp $QUAY_IO_KUBESECRET $TMP_QUAY
+    yq e -i '.metadata.name = "quay-cloudservices-pull"' $TMP_QUAY
+    if ! kubectl get namespace boot &>/dev/null; then
+      kubectl create namespace boot
+    fi
+    kubectl create -f $TMP_QUAY --namespace=boot
+    rm $TMP_QUAY
+fi
+
 rekor_server="rekor.$domain"
 sed -i "s/rekor-server.enterprise-contract-service.svc/$rekor_server/" $ROOT/argo-cd-apps/base/enterprise-contract.yaml
 yq -i e ".data |= .\"transparency.url\"=\"https://$rekor_server\"" $ROOT/components/build/tekton-chains/chains-config.yaml
