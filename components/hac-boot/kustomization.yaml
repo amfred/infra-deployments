@@ -1,5 +1,6 @@
 resources:
 - environment.yaml 
+- env-boot.yaml
 - bundle.yaml
 - hac_nav.yaml
 - hac-dev.yaml
