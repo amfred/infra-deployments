@@ -5,12 +5,12 @@
 #It takes few parameters
 #    --delete-cluster : if this is set CRC cluster is automatically deleted before start
 #    --memory, -m: sets memory allowance(MB) for CRC, default is 24576 MB
-#    --cpu, -c: sets CPU allowance for CRC, default is 6
+#    --cpu, -c: sets CPU allowance for CRC, default is 7
 #    --help, -h: Print the help with options
 
 DELETE_CLUSTER=0
 MEMORY=24576
-CPUS=6
+CPUS=7
 ROOT_DIR="$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )"
 #echo $ROOT_DIR
 CRCBINARY=$(readlink -f ~/.crc/bin/crc)
@@ -34,7 +34,7 @@ elif [ "$1" = "--help" -o "$1" = "-h" ]; then
     Usage: $0 [OPTIONS]
     --delete-cluster : if this is set CRC cluster is automatically deleted before start
     --memory, -m: sets memory allowance(MB) for CRC, default is 24576 MB
-    --cpu, -c: sets CPU allowance for CRC, default is 6
+    --cpu, -c: sets CPU allowance for CRC, default is 7
     --help, -h: Print the help with options
     "
     shift 1
