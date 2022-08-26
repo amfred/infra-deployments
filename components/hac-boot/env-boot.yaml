@@ -1,0 +1,65 @@
+apiVersion: cloud.redhat.com/v1alpha1
+kind: ClowdEnvironment
+metadata:
+  name: env-boot
+spec:
+  providers:
+    db:
+      mode: local
+    featureFlags:
+      mode: local
+    inMemoryDb:
+      mode: redis
+    kafka:
+      cluster:
+        resources:
+          limits:
+            cpu: 500m
+            memory: 1Gi
+          requests:
+            cpu: 250m
+            memory: 600Mi
+        version: 3.0.0
+      connect:
+        image: quay.io/cloudservices/xjoin-kafka-connect-strimzi:latest
+        version: 3.0.0
+      enableLegacyStrimzi: true
+      mode: operator
+    logging:
+      mode: none
+    metrics:
+      mode: operator
+      path: /metrics
+      port: 9000
+      prometheus:
+        deploy: true
+    objectStore:
+      mode: minio
+    pullSecrets:
+      - name: quay-cloudservices-pull
+        namespace: boot
+    testing:
+      configAccess: environment
+      iqe:
+        imageBase: quay.io/cloudservices/iqe-tests
+        resources:
+          limits:
+            cpu: 1
+            memory: 1Gi
+          requests:
+            cpu: 200m
+            memory: 256Mi
+      k8sAccessLevel: edit
+    web:
+      ingressClass: openshift-default
+      mode: local
+      port: 8000
+      privatePort: 10000
+  resourceDefaults:
+    limits:
+      cpu: 300m
+      memory: 256Mi
+    requests:
+      cpu: 30m
+      memory: 128Mi
+  targetNamespace: boot

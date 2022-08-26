@@ -1,0 +1,470 @@
+apiVersion: cloud.redhat.com/v1alpha1
+kind: ClowdApp
+metadata:
+  name: rbac
+  namespace: boot
+spec:
+  cyndi: {}
+  database:
+    name: rbac
+  deployments:
+  - metadata: {}
+    minReplicas: 0
+    name: worker-service
+    podSpec:
+      command:
+      - /bin/bash
+      - -c
+      - |
+        PYTHONPATH=${PWD}/rbac/ celery -A rbac.celery worker -l $DJANGO_LOG_LEVEL
+      env:
+      - name: DJANGO_LOG_LEVEL
+        value: INFO
+      - name: DJANGO_DEBUG
+        value: "False"
+      - name: PERMISSION_SEEDING_ENABLED
+        value: "False"
+      - name: ROLE_SEEDING_ENABLED
+        value: "False"
+      - name: GROUP_SEEDING_ENABLED
+        value: "False"
+      - name: DJANGO_SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: django-secret-key
+            name: rbac-secret
+            optional: false
+      - name: PRINCIPAL_PROXY_SERVICE_PROTOCOL
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-protocol
+            name: rbac-secret
+            optional: false
+      - name: PRINCIPAL_PROXY_SERVICE_HOST
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-host
+            name: rbac-secret
+            optional: false
+      - name: PRINCIPAL_PROXY_SERVICE_PORT
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-port
+            name: rbac-secret
+            optional: false
+      - name: PRINCIPAL_PROXY_SERVICE_PATH
+      - name: PRINCIPAL_PROXY_USER_ENV
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-env
+            name: rbac-secret
+            optional: false
+      - name: PRINCIPAL_PROXY_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            key: client-id
+            name: insights-rbac
+            optional: false
+      - name: PRINCIPAL_PROXY_API_TOKEN
+        valueFrom:
+          secretKeyRef:
+            key: token
+            name: insights-rbac
+            optional: false
+      - name: PRINCIPAL_PROXY_SERVICE_SSL_VERIFY
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-ssl-verify
+            name: rbac-secret
+            optional: true
+      - name: PRINCIPAL_PROXY_SERVICE_SOURCE_CERT
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-source-cert
+            name: rbac-secret
+            optional: true
+      - name: APP_NAMESPACE
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.namespace
+      - name: PGSSLMODE
+        value: prefer
+      - name: CLOWDER_ENABLED
+        value: "true"
+      - name: CW_NULL_WORKAROUND
+        value: "true"
+      - name: SENTRY_DSN
+        valueFrom:
+          secretKeyRef:
+            key: sentry-dsn
+            name: rbac-secret
+            optional: true
+      - name: MAX_SEED_THREADS
+        value: "2"
+      - name: ACCESS_CACHE_CONNECT_SIGNALS
+        value: "False"
+      - name: NOTIFICATIONS_ENABLED
+        value: "True"
+      - name: NOTIFICATIONS_RH_ENABLED
+        value: "True"
+      image: quay.io/cloudservices/rbac:d7ce666
+      initContainers:
+      - args:
+        - sh
+        - /opt/app-root/src/deploy/init-container-setup.sh
+        env:
+        - name: INIT_CONTAINER
+          value: "True"
+        inheritEnv: true
+      livenessProbe:
+        exec:
+          command:
+          - /bin/bash
+          - -c
+          - |
+            PYTHONPATH=${PWD}/rbac/ celery inspect ping -A rbac.celery
+        failureThreshold: 3
+        initialDelaySeconds: 120
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 10
+      metadata: {}
+      readinessProbe:
+        exec:
+          command:
+          - /bin/bash
+          - -c
+          - |
+            PYTHONPATH=${PWD}/rbac/ celery inspect ping -A rbac.celery
+        failureThreshold: 3
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 10
+      resources: {}
+      volumeMounts:
+      - mountPath: /opt/app-root/src/rbac/management/role/definitions
+        name: default-role-config
+      - mountPath: /opt/app-root/src/rbac/management/role/permissions
+        name: model-access-permissions
+      volumes:
+      - configMap:
+          name: rbac-config
+        name: default-role-config
+      - configMap:
+          name: model-access-permissions
+        name: model-access-permissions
+    webServices:
+      metrics: {}
+      private: {}
+      public: {}
+  - metadata: {}
+    minReplicas: 0
+    name: scheduler-service
+    podSpec:
+      command:
+      - /bin/bash
+      - -c
+      - |
+        PYTHONPATH=${PWD}/rbac/ celery -A rbac.celery beat -l $DJANGO_LOG_LEVEL
+      env:
+      - name: DJANGO_LOG_LEVEL
+        value: INFO
+      - name: DJANGO_DEBUG
+        value: "False"
+      - name: APP_NAMESPACE
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.namespace
+      - name: PERMISSION_SEEDING_ENABLED
+        value: "False"
+      - name: ROLE_SEEDING_ENABLED
+        value: "False"
+      - name: GROUP_SEEDING_ENABLED
+        value: "False"
+      - name: CLOWDER_ENABLED
+        value: "true"
+      - name: CW_NULL_WORKAROUND
+        value: "true"
+      - name: SENTRY_DSN
+        valueFrom:
+          secretKeyRef:
+            key: sentry-dsn
+            name: rbac-secret
+            optional: true
+      image: quay.io/cloudservices/rbac:d7ce666
+      livenessProbe:
+        exec:
+          command:
+          - /bin/bash
+          - -c
+          - |
+            PYTHONPATH=${PWD}/rbac/ celery inspect ping -A rbac.celery
+        failureThreshold: 3
+        initialDelaySeconds: 120
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 10
+      metadata: {}
+      readinessProbe:
+        exec:
+          command:
+          - /bin/bash
+          - -c
+          - |
+            PYTHONPATH=${PWD}/rbac/ celery inspect ping -A rbac.celery
+        failureThreshold: 3
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 10
+      resources: {}
+    webServices:
+      metrics: {}
+      private: {}
+      public: {}
+  - metadata: {}
+    minReplicas: 1
+    name: service
+    podSpec:
+      env:
+      - name: SENTRY_DSN
+        valueFrom:
+          secretKeyRef:
+            key: sentry-dsn
+            name: rbac-secret
+            optional: true
+      - name: SERVICE_PSKS
+        valueFrom:
+          secretKeyRef:
+            key: psks.json
+            name: rbac-psks
+            optional: false
+      - name: PGSSLMODE
+        value: prefer
+      - name: DJANGO_SECRET_KEY
+        valueFrom:
+          secretKeyRef:
+            key: django-secret-key
+            name: rbac-secret
+            optional: false
+      - name: PRINCIPAL_PROXY_SERVICE_PROTOCOL
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-protocol
+            name: rbac-secret
+            optional: false
+      - name: PRINCIPAL_PROXY_SERVICE_HOST
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-host
+            name: rbac-secret
+            optional: false
+      - name: PRINCIPAL_PROXY_SERVICE_PORT
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-port
+            name: rbac-secret
+            optional: false
+      - name: PRINCIPAL_PROXY_SERVICE_PATH
+      - name: PRINCIPAL_PROXY_USER_ENV
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-env
+            name: rbac-secret
+            optional: false
+      - name: PRINCIPAL_PROXY_CLIENT_ID
+        valueFrom:
+          secretKeyRef:
+            key: client-id
+            name: insights-rbac
+            optional: false
+      - name: PRINCIPAL_PROXY_API_TOKEN
+        valueFrom:
+          secretKeyRef:
+            key: token
+            name: insights-rbac
+            optional: false
+      - name: PRINCIPAL_PROXY_SERVICE_SSL_VERIFY
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-ssl-verify
+            name: rbac-secret
+            optional: true
+      - name: PRINCIPAL_PROXY_SERVICE_SOURCE_CERT
+        valueFrom:
+          secretKeyRef:
+            key: principal-proxy-source-cert
+            name: rbac-secret
+            optional: true
+      - name: POD_CPU_LIMIT
+        valueFrom:
+          resourceFieldRef:
+            containerName: rbac-service
+            divisor: "0"
+            resource: limits.cpu
+      - name: ACCESS_CACHE_ENABLED
+        value: "True"
+      - name: APP_NAMESPACE
+        valueFrom:
+          fieldRef:
+            fieldPath: metadata.namespace
+      - name: DJANGO_DEBUG
+        value: "False"
+      - name: API_PATH_PREFIX
+        value: /api/rbac
+      - name: DEVELOPMENT
+        value: "false"
+      - name: RBAC_LOG_LEVEL
+        value: INFO
+      - name: DJANGO_LOG_LEVEL
+        value: INFO
+      - name: DJANGO_LOG_FORMATTER
+        value: simple
+      - name: DJANGO_LOG_HANDLERS
+        value: console,ecs
+      - name: DJANGO_LOG_DIRECTORY
+      - name: DJANGO_LOGGING_FILE
+      - name: PERMISSION_SEEDING_ENABLED
+        value: "True"
+      - name: ROLE_SEEDING_ENABLED
+        value: "True"
+      - name: GROUP_SEEDING_ENABLED
+        value: "True"
+      - name: DISABLE_MIGRATE
+        value: "False"
+      - name: BYPASS_BOP_VERIFICATION
+        value: "False"
+      - name: ROLE_CREATE_ALLOW_LIST
+        value: cost-management,remediations,inventory,drift,policies,advisor,catalog,approval,vulnerability,compliance,automation-analytics,notifications,patch,integrations,ros
+      - name: RBAC_DESTRUCTIVE_ENABLED_UNTIL
+      - name: CLOWDER_ENABLED
+        value: "true"
+      - name: APP_CONFIG
+        value: /opt/app-root/src/rbac/gunicorn.py
+      - name: APP_HOME
+        value: /opt/app-root/src/rbac
+      - name: APP_MODULE
+        value: rbac.asgi
+      - name: APP_NAMESPACE
+        value: rbac
+      - name: CW_NULL_WORKAROUND
+        value: "true"
+      - name: REDIS_MAX_CONNECTIONS
+        value: "10"
+      - name: REDIS_SOCKET_CONNECT_TIMEOUT
+        value: "0.1"
+      - name: REDIS_SOCKET_TIMEOUT
+        value: "0.1"
+      - name: AUTHENTICATE_WITH_ORG_ID
+        value: "True"
+      - name: NOTIFICATIONS_ENABLED
+        value: "True"
+      - name: GUNICORN_WORKER_MULTIPLIER
+        value: "2"
+      image: quay.io/cloudservices/rbac:d7ce666
+      livenessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /api/rbac/v1/status/
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 3
+      metadata: {}
+      readinessProbe:
+        failureThreshold: 3
+        httpGet:
+          path: /api/rbac/v1/status/
+          port: 8000
+          scheme: HTTP
+        initialDelaySeconds: 60
+        periodSeconds: 10
+        successThreshold: 1
+        timeoutSeconds: 3
+      resources: {}
+      volumeMounts:
+      - mountPath: /opt/app-root/src/rbac/management/role/definitions
+        name: default-role-config
+      - mountPath: /opt/app-root/src/rbac/management/role/permissions
+        name: model-access-permissions
+      volumes:
+      - configMap:
+          name: rbac-config
+        name: default-role-config
+      - configMap:
+          name: model-access-permissions
+        name: model-access-permissions
+    webServices:
+      metrics: {}
+      private: {}
+      public:
+        apiPath: rbac
+        enabled: true
+  envName: env-boot
+  inMemoryDb: true
+  jobs:
+  - name: tenant-org-id-populator
+    podSpec:
+      command:
+      - ./org-id-column-populator
+      - -C
+      - -a
+      - account_id
+      - -o
+      - org_id
+      - -t
+      - api_tenant
+      - --ean-translator-addr
+      - http://apicast.3scale-dev.svc.cluster.local:8891
+      - --batch-size
+      - "50"
+      env:
+      - name: LOG_FORMAT
+        value: ${LOG_FORMAT}
+      - name: LOG_BATCH_FREQUENCY
+        value: "1"
+      image: quay.io/cloudservices/tenant-utils:latest
+      metadata: {}
+      resources:
+        limits:
+          cpu: 300m
+          memory: 1Gi
+        requests:
+          cpu: 50m
+          memory: 512Mi
+  - name: cross-account-request-target-org-populator
+    podSpec:
+      command:
+      - ./org-id-column-populator
+      - -C
+      - -a
+      - target_account
+      - -o
+      - target_org
+      - -t
+      - api_crossaccountrequest
+      - --ean-translator-addr
+      - http://apicast.3scale-dev.svc.cluster.local:8891
+      - --batch-size
+      - "50"
+      env:
+      - name: LOG_FORMAT
+        value: ${LOG_FORMAT}
+      - name: LOG_BATCH_FREQUENCY
+        value: "1"
+      image: quay.io/cloudservices/tenant-utils:latest
+      metadata: {}
+      resources:
+        limits:
+          cpu: 300m
+          memory: 1Gi
+        requests:
+          cpu: 50m
+          memory: 512Mi
+  kafkaTopics:
+  - partitions: 3
+    replicas: 3
+    topicName: platform.notifications.ingress
+  testing:
+    iqePlugin: rbac

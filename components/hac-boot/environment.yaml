@@ -1,6 +1,7 @@
 apiVersion: cloud.redhat.com/v1alpha1
 kind: FrontendEnvironment
 metadata:
-  name: env-boot
+  name: env-boot 
 spec:
-  sso: https://env-boot-auth/auth/
+  sso: 'https://env-boot-n2vxmwvf-auth.apps-crc.testing/auth/'
+   

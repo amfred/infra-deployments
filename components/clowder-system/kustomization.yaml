@@ -1,12 +1,5 @@
 resources:
-- rbac.yaml
-- environment.yaml 
-- bundle.yaml
-- hac_nav.yaml
-- hac-dev.yaml
-- hac.yaml
-- chrome.yml 
-- chrome-route.yml   
+- deploy-processed.yml
 
 generatorOptions:
   disableNameSuffixHash: true
