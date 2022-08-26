@@ -82,6 +82,9 @@ if [ -n "$QUAY_IO_KUBESECRET" ]; then
     if ! kubectl get namespace boot &>/dev/null; then
       kubectl create namespace boot
     fi
+    if kubectl get secret quay-cloudservices-pull --namespace=boot &>/dev/null; then
+      kubectl delete secret quay-cloudservices-pull --namespace=boot
+    fi 
     kubectl create -f $TMP_QUAY --namespace=boot
     rm $TMP_QUAY
 fi
