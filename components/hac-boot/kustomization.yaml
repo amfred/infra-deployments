@@ -1,5 +1,4 @@
 resources:
-- rbac.yaml
 - environment.yaml 
 - bundle.yaml
 - hac_nav.yaml
