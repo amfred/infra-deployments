@@ -111,7 +111,7 @@ spec:
         cpu: 500m
         memory: 256Mi
       requests:
-        cpu: 250m
+        cpu: 150m
         memory: 128Mi
     route:
       enabled: false
@@ -122,7 +122,7 @@ spec:
         cpu: 500m
         memory: 256Mi
       requests:
-        cpu: 250m
+        cpu: 150m
         memory: 128Mi
   initialSSHKnownHosts: {}
   prometheus:
@@ -140,7 +140,7 @@ spec:
         cpu: 500m
         memory: 256Mi
       requests:
-        cpu: 250m
+        cpu: 150m
         memory: 128Mi
   repo:
     logLevel: "debug"
@@ -149,7 +149,7 @@ spec:
         cpu: "1"
         memory: 1Gi
       requests:
-        cpu: 250m
+        cpu: 150m
         memory: 256Mi
   server:
     logLevel: "debug"
@@ -165,7 +165,7 @@ spec:
         cpu: 500m
         memory: 256Mi
       requests:
-        cpu: 125m
+        cpu: 100m
         memory: 128Mi
     route:
       enabled: true

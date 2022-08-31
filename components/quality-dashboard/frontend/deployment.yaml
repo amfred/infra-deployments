@@ -50,14 +50,14 @@ spec:
               cpu: 500m
               memory: 256Mi
             requests:
-              cpu: 100m
+              cpu: 50m
               memory: 100Mi
         - resources:
             limits:
               cpu: 500m
               memory: 256Mi
             requests:
-              cpu: 100m
+              cpu: 50m
               memory: 32Mi
           name: quality-frontend-dashboard
           env:

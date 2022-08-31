@@ -4917,7 +4917,7 @@ items:
               cpu: 500m
               memory: 1Gi
             requests:
-              cpu: 100m
+              cpu: 50m
               memory: 500Mi
           securityContext:
             allowPrivilegeEscalation: false

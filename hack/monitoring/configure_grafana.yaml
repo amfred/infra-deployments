@@ -124,7 +124,7 @@ objects:
         cpu: 2000m
         memory: 8000Mi
       requests:
-        cpu: 100m
+        cpu: 50m
         memory: 200Mi
 
 # Route and service to provide a secured access to the Grafana console
