@@ -3,5 +3,5 @@ kind: FrontendEnvironment
 metadata:
   name: env-boot 
 spec:
-  sso: 'https://env-boot-5d2l2s07-auth.apps-crc.testing/auth/'
+  sso: 'https://env-boot-uxu8263x-auth.apps.ci-ln-m7200b2-72292.origin-ci-int-gce.dev.rhcloud.com/auth/'
    

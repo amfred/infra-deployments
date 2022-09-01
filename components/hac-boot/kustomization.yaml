@@ -6,7 +6,8 @@ resources:
 - hac-dev.yaml
 - hac.yaml
 - chrome.yml 
-- chrome-route.yml   
+- chrome-route.yml  
+- env-boot.yaml  
 
 generatorOptions:
   disableNameSuffixHash: true
