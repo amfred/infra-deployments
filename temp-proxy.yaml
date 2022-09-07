@@ -86,7 +86,7 @@ objects:
           containers:
             - env:
                 - name: HJ_K8S
-                  value: https://console-openshift-console.apps.appstudio-demo.76oz.p1.openshiftapps.com/k8s/
+                  value: https://api.appstudio-demo.76oz.p1.openshiftapps.com:6443
                 - name: HJ_SERVE
                   value: :8080
                 - name: HJ_SSL
