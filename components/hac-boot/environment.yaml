@@ -5,5 +5,5 @@ metadata:
 spec:
   sso: 'https://env-boot-751imhwx-auth.apps.appstudio-demo.76oz.p1.openshiftapps.com/auth/'
   ingressClass: openshift-default
-  hostname: env-boot-local-127-0-0-1.nip.io
+  hostname: appstudio-demo.76oz.p1.openshiftapps.com
    
