@@ -9,7 +9,22 @@ parameters:
     required: true
   - name: HOSTNAME
     required: true
+  - name: K8SURL
+    required: true
+  - name: TOKEN
+    required: true
+  - name: KEYCLOAK_URL
+    required: true
 objects:
+  - apiVersion: v1
+    kind: Secret
+    type: Opaque
+    metadata:
+      name: cluster-login-data
+    stringData:
+      k8surl: ${K8SURL}
+      token: ${TOKEN}
+      keycloak: ${KEYCLOAK_URL}
   - apiVersion: v1
     kind: Service
     metadata:
@@ -86,15 +101,26 @@ objects:
           containers:
             - env:
                 - name: HJ_K8S
-                  value: https://api.appstudio-demo.76oz.p1.openshiftapps.com:6443
+                  valueFrom:
+                    secretKeyRef:
+                      name: cluster-login-data
+                      key: k8surl
                 - name: HJ_SERVE
                   value: :8080
                 - name: HJ_SSL
                   value: 'false'
                 - name: HJ_TOKEN
-                  value: sha256~WCBXCQEReR3HrNnveGV49uOEcmPEXkUt4BpYkrOFFxY
+                  valueFrom:
+                    secretKeyRef:
+                      name: cluster-login-data
+                      key: token
                 - name: HJ_MODE
                   value: complex
+                - name: HJ_KEYCLOAK
+                  valueFrom:
+                    secretKeyRef:
+                      name: cluster-login-data
+                      key: keycloak
               image: quay.io/psav/hac-proxy:098a9d8
               imagePullPolicy: Always
               name: hac-proxy
