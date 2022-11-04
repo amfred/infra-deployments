@@ -1,4 +1,5 @@
 resources:
+- application-service-namespace.yaml
 - allow-argocd-to-manage.yaml
 - argocd-permissions.yaml
 - https://github.com/redhat-appstudio/application-service/config/default?ref=3de6099913d349ac33c0e7c39ef8f3aa94856da7
