@@ -2,11 +2,16 @@
   {
     "op": "replace",
     "path": "/data/VAULTHOST",
-    "value": ""
+    "value": "https://vault-spi-vault.apps.crc.testing"
   },
   {
     "op": "replace",
     "path": "/data/BASEURL",
-    "value": ""
+    "value": "https://"
+  },
+  {
+    "op": "add",
+    "path": "/data/VAULTINSECURETLS",
+    "value": "true"
   }
 ]
