@@ -2,6 +2,7 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
+- enterprise-contract-service-namespace.yaml
 - https://github.com/hacbs-contract/enterprise-contract-controller/config/crd?ref=de9236afa24354425fe8b1dda0a2187bbcd435a0
 
 # Kustomize does not allow github.com urls that reference a single-file. They must always reference
@@ -16,6 +17,3 @@ images:
 - name: quay.io/redhat-appstudio/enterprise-contract-controller
   newName: quay.io/redhat-appstudio/enterprise-contract-controller
   newTag: de9236afa24354425fe8b1dda0a2187bbcd435a0
-
-patchesStrategicMerge:
-  - ./namespace_patch.yaml

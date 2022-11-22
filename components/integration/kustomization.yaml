@@ -1,6 +1,7 @@
 resources:
 - allow-argocd-to-manage.yaml
 - argocd-permissions.yaml
+- integration-service-namespace.yaml
 - https://github.com/redhat-appstudio/integration-service/config/default?ref=5832989ccc82a82d6076b9c99198f949846aee95
 - .tekton/
 
@@ -16,6 +17,3 @@ namespace: integration-service
 
 patches:
   - ./manager_resources_patch.yaml
-
-patchesStrategicMerge:
-  - ./namespace_patch.yaml

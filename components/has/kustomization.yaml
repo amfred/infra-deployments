@@ -1,6 +1,7 @@
 resources:
 - allow-argocd-to-manage.yaml
 - argocd-permissions.yaml
+- application-service-namespace.yaml
 - https://github.com/redhat-appstudio/application-service/config/default?ref=e4db3e6a45240f4209d2b8b2c2d86b86626f4c11
 - .tekton/
 
@@ -23,6 +24,3 @@ namespace: application-service
 
 patches:
   - ./manager_resources_patch.yaml
-
-patchesStrategicMerge:
-  - ./namespace_patch.yaml
