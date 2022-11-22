@@ -16,7 +16,8 @@ images:
   newTag: stable
 
 patchesStrategicMerge:
-- patch-postgres-redhat-statefulset.yaml
+- ./patch-postgres-redhat-statefulset.yaml
+- ./namespace_patch.yaml
 
 patches:
 - path: patch-tekton-results-api-no-auth.yaml

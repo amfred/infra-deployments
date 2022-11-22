@@ -32,6 +32,9 @@ patches:
       name: spi-controller-manager
     path: operator-limits-patch.json
 
+patchesStrategicMerge:
+  - ./namespace_patch.yaml
+
 # we plan to use approle authentication, but it's not ready yet
 # with these dummy secrets, we're satisfying spi deployments, but they're not really used
 secretGenerator:
